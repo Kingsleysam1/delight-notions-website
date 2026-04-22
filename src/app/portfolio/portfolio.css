@@ -1,0 +1,210 @@
+/* ─── CSS custom properties on :root so all elements can access them ── */
+:root {
+  --aspect: 4 / 5;
+  --c-gap: 0.5rem;
+  --column: 80px;
+  --column-count: 4;
+  --panel-gap: 1rem;
+  --panel-img-size: calc((100vh - 3rem) * 4 / 5 - var(--panel-gap));
+}
+
+@media screen and (min-width: 65em) {
+  :root {
+    --column-count: 8;
+  }
+}
+
+/* ─── Loading overlay ──────────────────────────────────────────────── */
+.loading::before,
+.loading::after {
+  content: '';
+  position: fixed;
+  z-index: 10000;
+}
+
+.loading::before {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--background);
+}
+
+.loading::after {
+  top: 50%;
+  left: 50%;
+  width: 100px;
+  height: 1px;
+  margin: 0 0 0 -50px;
+  background: var(--foreground);
+  animation: loaderAnim 1.5s ease-in-out infinite alternate forwards;
+}
+
+@keyframes loaderAnim {
+  0%    { transform: scaleX(0); transform-origin: 0% 50%; }
+  50%   { transform: scaleX(1); transform-origin: 0% 50%; }
+  50.1% { transform: scaleX(1); transform-origin: 100% 50%; }
+  100%  { transform: scaleX(0); transform-origin: 100% 50%; }
+}
+
+/* ─── Portfolio Grid ───────────────────────────────────────────────── */
+.portfolio-grid {
+  padding: 1rem 0;
+  display: grid;
+  grid-template-columns: repeat(var(--column-count), minmax(var(--column), 1fr));
+  column-gap: var(--c-gap);
+  row-gap: 5rem;
+  width: 100%;
+}
+
+.portfolio-grid__item {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  cursor: pointer;
+  will-change: transform, clip-path;
+  overflow: hidden;
+}
+
+.portfolio-grid__item:hover .portfolio-grid__item-image {
+  opacity: 0.7;
+}
+
+.portfolio-grid__item-image {
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--aspect);
+  transition: opacity 0.15s cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+.portfolio-grid__item-caption h3 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+  text-align: right;
+  color: #fff;
+}
+
+.portfolio-grid__item-caption p {
+  display: none;
+}
+
+/* ─── Panel (full-screen overlay) ─────────────────────────────────── */
+.portfolio-panel {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100vh;
+  padding: 1.5rem;
+  display: grid;
+  gap: var(--panel-gap);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2000;
+  will-change: opacity;
+  /* Mobile: stacked – image on top, content below */
+  grid-template-rows: 1fr min-content;
+  grid-template-columns: 100%;
+  grid-template-areas:
+    'panel-image'
+    'panel-content';
+}
+
+@media screen and (min-width: 40em) {
+  .portfolio-panel {
+    /* Desktop: side-by-side – image left, content right */
+    grid-template-rows: 100%;
+    grid-template-columns: var(--panel-img-size) 1fr;
+    grid-template-areas: 'panel-image panel-content';
+  }
+
+  .portfolio-panel--right {
+    grid-template-columns: 1fr var(--panel-img-size);
+    grid-template-areas: 'panel-content panel-image';
+  }
+}
+
+/* ─── Panel image ──────────────────────────────────────────────────── */
+.portfolio-panel__img {
+  grid-area: panel-image;
+  background-size: cover;
+  background-position: center;
+  /* Mobile: fill width, maintain aspect ratio */
+  width: 100%;
+  height: auto;
+  aspect-ratio: var(--aspect);
+}
+
+@media screen and (min-width: 40em) {
+  .portfolio-panel__img {
+    /* Desktop: fill full panel height */
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+    aspect-ratio: unset;
+  }
+}
+
+/* ─── Panel content ────────────────────────────────────────────────── */
+.portfolio-panel__content {
+  grid-area: panel-content;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  align-items: flex-end;
+  text-align: right;
+  color: #fff;
+}
+
+@media screen and (min-width: 65em) {
+  .portfolio-panel--right .portfolio-panel__content {
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+.portfolio-panel__content h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.portfolio-panel__content p {
+  margin: 0;
+  max-width: 150px;
+  font-size: 1rem;
+  color: #a3a3a3;
+}
+
+/* ─── Close button ─────────────────────────────────────────────────── */
+.portfolio-panel__close {
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  cursor: pointer;
+  color: #a22d1d;
+  margin-top: auto;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.portfolio-panel__close:hover,
+.portfolio-panel__close:focus {
+  outline: none;
+  color: #ff4733;
+}
+
+/* ─── Flying mover elements (created by GSAP) ─────────────────────── */
+.portfolio-mover {
+  position: fixed;
+  aspect-ratio: var(--aspect);
+  background-size: cover;
+  background-position: 50% 50%;
+  will-change: transform, clip-path;
+  pointer-events: none;
+}
